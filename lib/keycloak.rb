@@ -429,7 +429,7 @@ module Keycloak
       generic_delete("sessions/#{session_id}", nil, nil, access_token)
     end
 
-    def self.session_logout_all(user_id, access_token = nil)
+    def self.logout_user_sessions(user_id, access_token = nil)
       generic_post("users/#{user_id}/logout", nil, nil, access_token)
     end
 
@@ -635,12 +635,12 @@ module Keycloak
       default_call(proc, client_id, secret)
     end
 
-    def self.session_logout_all(user_id)
+    def self.logout_user_sessions(user_id)
       client_id = Keycloak::Client.client_id if isempty?(client_id)
       secret = Keycloak::Client.secret if isempty?(secret)
 
       proc = lambda { |token|
-        Keycloak::Admin.session_logout_all(user_id, token["access_token"])
+        Keycloak::Admin.logout_user_sessions(user_id, token["access_token"])
       }
 
       default_call(proc, client_id, secret)

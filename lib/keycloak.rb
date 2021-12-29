@@ -421,6 +421,18 @@ module Keycloak
     class << self
     end
 
+    def self.get_user_sessions(user_id, access_token = nil)
+      generic_get("users/#{user_id}/sessions", nil, access_token)
+    end
+
+    def self.session_logout(session_id, access_token = nil)
+      generic_delete("sessions/#{session_id}", nil, nil, access_token)
+    end
+
+    def self.session_logout_all(user_id, access_token = nil)
+      generic_post("users/#{user_id}/logout", nil, nil, access_token)
+    end
+
     def self.get_users(query_parameters = nil, access_token = nil)
       generic_get("users/", query_parameters, access_token)
     end
@@ -601,17 +613,45 @@ module Keycloak
     class << self
     end
 
+    def self.get_user_sessions(user_id)
+      client_id = Keycloak::Client.client_id if isempty?(client_id)
+      secret = Keycloak::Client.secret if isempty?(secret)
+
+      proc = lambda { |token|
+        Keycloak::Admin.get_user_sessions(user_id, token["access_token"])
+      }
+
+      default_call(proc, client_id, secret)
+    end
+
+    def self.session_logout(session_id)
+      client_id = Keycloak::Client.client_id if isempty?(client_id)
+      secret = Keycloak::Client.secret if isempty?(secret)
+
+      proc = lambda { |token|
+        Keycloak::Admin.session_logout(session_id, token["access_token"])
+      }
+
+      default_call(proc, client_id, secret)
+    end
+
+    def self.session_logout_all(user_id)
+      client_id = Keycloak::Client.client_id if isempty?(client_id)
+      secret = Keycloak::Client.secret if isempty?(secret)
+
+      proc = lambda { |token|
+        Keycloak::Admin.session_logout_all(user_id, token["access_token"])
+      }
+
+      default_call(proc, client_id, secret)
+    end
+
     def self.reset_password(id, credential_representation, client_id = "", secret = "")
       client_id = Keycloak::Client.client_id if isempty?(client_id)
       secret = Keycloak::Client.secret if isempty?(secret)
 
       proc = lambda { |token|
         Keycloak::Admin.reset_password(id, credential_representation, token["access_token"])
-        # Keycloak.generic_request(token["access_token"],
-        #   Keycloak::Admin.full_url("users/#{user_id}/execute-actions-email"),
-        #   { redirect_uri: redirect_uri, client_id: client_id },
-        #   ["UPDATE_PASSWORD"],
-        #   "PUT")
       }
 
       default_call(proc, client_id, secret)

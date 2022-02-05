@@ -668,6 +668,17 @@ module Keycloak
       default_call(proc, client_id, secret)
     end
 
+    def self.delete_user(id, client_id = "", secret = "")
+      client_id = Keycloak::Client.client_id if isempty?(client_id)
+      secret = Keycloak::Client.secret if isempty?(secret)
+
+      proc = lambda { |token|
+        Keycloak::Admin.delete_user(id, token["access_token"])
+      }
+
+      default_call(proc, client_id, secret)
+    end
+
     def self.get_users(query_parameters = nil, client_id = "", secret = "")
       client_id = Keycloak::Client.client_id if isempty?(client_id)
       secret = Keycloak::Client.secret if isempty?(secret)

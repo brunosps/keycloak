@@ -335,7 +335,7 @@ module Keycloak
     KEYCLOACK_CONTROLLER_DEFAULT = "session".freeze
 
     def self.get_installation
-      if File.exists?(Keycloak.installation_file)
+      if File.exist?(Keycloak.installation_file)
         installation = JSON File.read(Keycloak.installation_file)
         @realm = installation["realm"]
         @client_id = installation["resource"]
@@ -652,6 +652,17 @@ module Keycloak
 
       proc = lambda { |token|
         Keycloak::Admin.reset_password(id, credential_representation, token["access_token"])
+      }
+
+      default_call(proc, client_id, secret)
+    end
+
+    def self.create_user(user_representation, client_id = "", secret = "")
+      client_id = Keycloak::Client.client_id if isempty?(client_id)
+      secret = Keycloak::Client.secret if isempty?(secret)
+
+      proc = lambda { |token|
+        Keycloak::Admin.create_user(user_representation, token["access_token"])
       }
 
       default_call(proc, client_id, secret)

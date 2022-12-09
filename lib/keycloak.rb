@@ -880,11 +880,10 @@ module Keycloak
           if user["federationLink"] != nil || Keycloak.generic_request(token["access_token"],
                                                                        Keycloak::Admin.full_url("users/#{user["id"]}/reset-password"),
                                                                        nil, credential_representation, "PUT")
-            client = JSON Keycloak.generic_request(token["access_token"],
-                                                   Keycloak::Admin.full_url("clients/"),
-                                                   { clientId: client_id }, nil, "GET")
-
             if client_roles_names.count > 0
+              client = JSON Keycloak.generic_request(token["access_token"],
+                                                     Keycloak::Admin.full_url("clients/"),
+                                                     { clientId: client_id }, nil, "GET")
               roles = []
               client_roles_names.each do |r|
                 unless isempty?(r)
